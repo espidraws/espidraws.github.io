@@ -4,7 +4,7 @@ import { withBase } from "../lib/url";
 import SectionTitle from "./SectionTitle.astro";
 
 interface Props {
-    reviews: CollectionEntry<"reviews">["data"]["content"];
+    reviews: CollectionEntry<"reviews">["data"]["content"]["reviews"];
 }
 
 const { reviews } = Astro.props;

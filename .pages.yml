@@ -10,65 +10,73 @@ content:
     type: file
     path: src/content/thumbnails.json
     format: json
-    list:
-      collapsible:
-        collapsed: true
-        summary: "{label} ({price})"
     fields:
-      - name: label
-        label: Name
-        type: string
-        required: true
-      - name: badge
-        label: Badge (e.g. NEW-)
-        type: string
-      - name: price
-        label: Price
-        type: string
-        required: true
-      - name: items
-        label: Thumbnails
+      - name: tiers
+        label: Carousels
         type: object
         list:
           collapsible:
             collapsed: true
-            summary: "{title}"
+            summary: "{label} ({price})"
         fields:
-          - name: title
-            label: Title
+          - name: label
+            label: Name
             type: string
             required: true
-          - name: image
-            label: Image (1280×720)
-            type: image
+          - name: badge
+            label: Badge (e.g. NEW-)
+            type: string
+          - name: price
+            label: Price
+            type: string
             required: true
+          - name: items
+            label: Thumbnails
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{title}"
+            fields:
+              - name: title
+                label: Title
+                type: string
+                required: true
+              - name: image
+                label: Image (1280×720)
+                type: image
+                required: true
 
   - name: reviews
     label: Client reviews
     type: file
     path: src/content/reviews.json
     format: json
-    list:
-      collapsible:
-        collapsed: true
-        summary: "{name}"
     fields:
-      - name: name
-        label: Client name
-        type: string
-        required: true
-      - name: subscribers
-        label: Subscribers (e.g. 10k)
-        type: string
-        required: true
-      - name: quote
-        label: Review
-        type: text
-        required: true
-      - name: avatar
-        label: Avatar (square)
-        type: image
-        required: true
+      - name: reviews
+        label: Reviews
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{name}"
+        fields:
+          - name: name
+            label: Client name
+            type: string
+            required: true
+          - name: subscribers
+            label: Subscribers (e.g. 10k)
+            type: string
+            required: true
+          - name: quote
+            label: Review
+            type: text
+            required: true
+          - name: avatar
+            label: Avatar (square)
+            type: image
+            required: true
 
   - name: ocDesigns
     label: OC designs

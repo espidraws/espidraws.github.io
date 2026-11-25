@@ -54,28 +54,32 @@ const ocDesigns = defineCollection({
 const thumbnails = defineCollection({
     loader: loadWholeFile("src/content/thumbnails.json"),
     schema: z.object({
-        content: z.array(
-            z.object({
-                label: z.string(),
-                badge: z.string().optional(),
-                price: z.string(),
-                items: z.array(z.object({ title: z.string(), image: z.string() })),
-            }),
-        ),
+        content: z.object({
+            tiers: z.array(
+                z.object({
+                    label: z.string(),
+                    badge: z.string().optional(),
+                    price: z.string(),
+                    items: z.array(z.object({ title: z.string(), image: z.string() })),
+                }),
+            ),
+        }),
     }),
 });
 
 const reviews = defineCollection({
     loader: loadWholeFile("src/content/reviews.json"),
     schema: z.object({
-        content: z.array(
-            z.object({
-                name: z.string(),
-                subscribers: z.string(),
-                quote: z.string(),
-                avatar: z.string(),
-            }),
-        ),
+        content: z.object({
+            reviews: z.array(
+                z.object({
+                    name: z.string(),
+                    subscribers: z.string(),
+                    quote: z.string(),
+                    avatar: z.string(),
+                }),
+            ),
+        }),
     }),
 });
 

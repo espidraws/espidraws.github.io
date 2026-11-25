@@ -9,8 +9,8 @@ import Layout from "../layouts/Layout.astro";
 
 const site = (await getEntry("site", "main"))?.data.content;
 const ocDesigns = (await getEntry("ocDesigns", "main"))?.data.content;
-const tiers = (await getEntry("thumbnails", "main"))?.data.content;
-const reviews = (await getEntry("reviews", "main"))?.data.content;
+const tiers = (await getEntry("thumbnails", "main"))?.data.content.tiers;
+const reviews = (await getEntry("reviews", "main"))?.data.content.reviews;
 if (!site || !ocDesigns || !tiers || !reviews) {
     throw new Error("A content file in src/content is missing");
 }
