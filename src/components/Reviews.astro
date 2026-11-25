@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import { withBase } from "../lib/url";
 import SectionTitle from "./SectionTitle.astro";
 
 interface Props {
@@ -15,7 +16,7 @@ const { reviews } = Astro.props;
         {reviews.map((review) => (
             <li>
                 <figure>
-                    <img src={review.avatar} alt="" width="256" height="256" loading="lazy" decoding="async" />
+                    <img src={withBase(review.avatar)} alt="" width="256" height="256" loading="lazy" decoding="async" />
                     <figcaption>
                         <span class="name">{review.name}</span>
                         <span class="subscribers">{review.subscribers} Subscribers</span>

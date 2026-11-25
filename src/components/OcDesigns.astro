@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import { withBase } from "../lib/url";
 import SectionTitle from "./SectionTitle.astro";
 
 interface Props {
@@ -12,7 +13,7 @@ const sizes = ["head", "half", "full"] as const;
 
 <section id="oc-designs">
     <SectionTitle title={designs.title} />
-    <img class="showcase" src={designs.image} alt={designs.imageAlt} width="1600" height="900" loading="lazy" decoding="async" />
+    <img class="showcase" src={withBase(designs.image)} alt={designs.imageAlt} width="1600" height="900" loading="lazy" decoding="async" />
     <div class="styles">
         {designs.styles.map((style) => (
             <div class="style">

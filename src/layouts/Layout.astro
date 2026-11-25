@@ -3,6 +3,7 @@ import "@fontsource/montserrat/700.css";
 import "@fontsource/montserrat/900.css";
 import "@fontsource/montserrat/900-italic.css";
 import "@fontsource/work-sans/600.css";
+import { withBase } from "../lib/url";
 import "../styles/global.css";
 
 interface Props {
@@ -12,7 +13,8 @@ interface Props {
 }
 
 const { title, description, image } = Astro.props;
-const imageUrl = new URL(image, Astro.site).href;
+const imagePath = withBase(image);
+const imageUrl = new URL(imagePath, Astro.site).href;
 ---
 
 <!doctype html>
@@ -26,7 +28,7 @@ const imageUrl = new URL(image, Astro.site).href;
         <meta property="og:description" content={description} />
         <meta property="og:image" content={imageUrl} />
         <meta name="twitter:card" content="summary" />
-        <link rel="icon" href={image} />
+        <link rel="icon" href={imagePath} />
     </head>
     <body>
         <slot />

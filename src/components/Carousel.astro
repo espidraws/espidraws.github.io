@@ -2,6 +2,7 @@
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { withBase } from "../lib/url";
 
 interface Slide {
     title: string;
@@ -20,9 +21,9 @@ const { galleryId, label, slides } = Astro.props;
 <div class="swiper carousel" aria-label={label}>
     <div class="swiper-wrapper">
         {slides.map((slide, index) => (
-            <a class="swiper-slide glightbox" href={slide.image} data-gallery={galleryId} data-title={slide.title}>
+            <a class="swiper-slide glightbox" href={withBase(slide.image)} data-gallery={galleryId} data-title={slide.title}>
                 <img
-                    src={slide.image}
+                    src={withBase(slide.image)}
                     alt={slide.title}
                     width="1280"
                     height="720"

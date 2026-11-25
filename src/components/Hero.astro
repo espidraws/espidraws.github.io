@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import { withBase } from "../lib/url";
 
 interface Props {
     site: CollectionEntry<"site">["data"]["content"];
@@ -14,7 +15,7 @@ const { site } = Astro.props;
 </nav>
 
 <header class="hero">
-    <img class="avatar" src={site.avatar} alt="" width="400" height="400" />
+    <img class="avatar" src={withBase(site.avatar)} alt="" width="400" height="400" />
     <div>
         <div class="name-row">
             <h1>{site.name}</h1>
