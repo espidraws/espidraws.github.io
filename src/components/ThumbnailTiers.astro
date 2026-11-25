@@ -1,0 +1,71 @@
+---
+import type { CollectionEntry } from "astro:content";
+import Carousel from "./Carousel.astro";
+import SectionTitle from "./SectionTitle.astro";
+
+interface Props {
+    copy: CollectionEntry<"site">["data"]["content"]["thumbnails"];
+    tiers: CollectionEntry<"thumbnails">["data"]["content"];
+}
+
+const { copy, tiers } = Astro.props;
+---
+
+<section id="thumbnails">
+    <SectionTitle title={copy.title} subtitle={copy.subtitle} />
+    <div class="tiers">
+        {tiers.map((tier, index) => (
+            <article>
+                <h3 class="price">
+                    {tier.badge && <span class="badge">{tier.badge}</span>} {tier.price}
+                </h3>
+                <Carousel galleryId={`tier-${index}`}label={`${tier.label} thumbnails`} slides={tier.items} />
+                <p class="label">{tier.label}</p>
+            </article>
+        ))}
+    </div>
+    <p class="deal">{copy.deal}</p>
+    {copy.notes.map((note) => <p class="note">{note}</p>)}
+</section>
+
+<style>
+    .tiers {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .price {
+        margin: 0 0 0.5rem;
+        font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+        font-weight: 900;
+        text-align: center;
+    }
+
+    .badge {
+        color: var(--green);
+    }
+
+    .label {
+        margin: 0.4rem 0 0;
+        font-size: 1.4rem;
+        font-weight: 900;
+        text-align: center;
+    }
+
+    .deal {
+        margin: 2rem 0 0.3rem;
+        color: var(--green);
+        font-size: clamp(1.1rem, 3vw, 2rem);
+        font-weight: 900;
+        text-align: center;
+    }
+
+    .note {
+        margin: 0;
+        font-style: italic;
+        font-weight: 900;
+        text-align: center;
+    }
+</style>

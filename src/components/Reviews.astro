@@ -1,0 +1,80 @@
+---
+import type { CollectionEntry } from "astro:content";
+import SectionTitle from "./SectionTitle.astro";
+
+interface Props {
+    reviews: CollectionEntry<"reviews">["data"]["content"];
+}
+
+const { reviews } = Astro.props;
+---
+
+<section id="reviews">
+    <SectionTitle title="Client Reviews" />
+    <ul>
+        {reviews.map((review) => (
+            <li>
+                <figure>
+                    <img src={review.avatar} alt="" width="256" height="256" loading="lazy" decoding="async" />
+                    <figcaption>
+                        <span class="name">{review.name}</span>
+                        <span class="subscribers">{review.subscribers} Subscribers</span>
+                    </figcaption>
+                    <blockquote>“{review.quote}”</blockquote>
+                </figure>
+            </li>
+        ))}
+    </ul>
+</section>
+
+<style>
+    ul {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+        gap: 2rem;
+        margin: 2rem 0 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    figure {
+        display: grid;
+        grid-template-columns: 110px 1fr;
+        grid-template-areas:
+            "avatar name"
+            "avatar quote";
+        gap: 0.2rem 1rem;
+        margin: 0;
+    }
+
+    img {
+        grid-area: avatar;
+        width: 110px;
+    }
+
+    figcaption {
+        grid-area: name;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0 0.6rem;
+    }
+
+    .name {
+        font-size: 1.6rem;
+        font-weight: 900;
+    }
+
+    .subscribers {
+        color: var(--muted);
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    blockquote {
+        grid-area: quote;
+        margin: 0;
+        font-family: var(--font-body);
+        font-weight: 600;
+    }
+</style>

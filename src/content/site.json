@@ -1,0 +1,23 @@
+{
+  "name": "Espi Draws",
+  "tagline": "[Thumbnail Artist] [Digital Designer]",
+  "avatar": "/uploads/site/avatar.jpg",
+  "socials": [
+    { "label": "X", "url": "https://x.com/EspiDraws" }
+  ],
+  "buttons": [
+    { "label": "Contact Me", "url": "https://eppycore.carrd.co/", "color": "blue" },
+    { "label": "Portfolio", "url": "https://ytjobs.co/talent/vitrine/406889", "color": "red" },
+    { "label": "Print Shop", "url": "https://eppycore.acggoods.com/", "color": "green" }
+  ],
+  "contactUrl": "https://eppycore.carrd.co/",
+  "thumbnails": {
+    "title": "Thumbnails",
+    "subtitle": "$5 dollars off your first purchase",
+    "deal": "2 Thumbnails / 5% OFF --- 4 Thumbnails / 10% OFF",
+    "notes": [
+      "Sales and Other Discounts Don't Stack on Each Other",
+      "Massive Changes To Thumbnail / 1 Day Delivery = Extra Charge $+"
+    ]
+  }
+}

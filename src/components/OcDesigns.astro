@@ -1,0 +1,84 @@
+---
+import type { CollectionEntry } from "astro:content";
+import SectionTitle from "./SectionTitle.astro";
+
+interface Props {
+    designs: CollectionEntry<"ocDesigns">["data"]["content"];
+}
+
+const { designs } = Astro.props;
+const sizes = ["head", "half", "full"] as const;
+---
+
+<section id="oc-designs">
+    <SectionTitle title={designs.title} />
+    <img class="showcase" src={designs.image} alt={designs.imageAlt} width="1600" height="900" loading="lazy" decoding="async" />
+    <div class="styles">
+        {designs.styles.map((style) => (
+            <div class="style">
+                <h3 class="style-name">{style.name}</h3>
+                <dl>
+                    {sizes.map((size) => (
+                        <div class="row">
+                            <dt>{size}</dt>
+                            <dd>{style[size]}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+        ))}
+    </div>
+    {designs.notes.map((note) => <p class="note">{note}</p>)}
+</section>
+
+<style>
+    .showcase {
+        margin: 1.5rem auto 0;
+    }
+
+    .styles {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem 4rem;
+        margin-block: 1rem;
+    }
+
+    dl {
+        margin: 0;
+    }
+
+    .style-name {
+        margin: 0 0 0.4rem;
+        text-align: center;
+        font-size: clamp(2rem, 4vw, 2.8rem);
+        font-weight: 900;
+        text-transform: uppercase;
+        text-decoration: underline;
+    }
+
+    .row {
+        display: flex;
+        justify-content: center;
+        gap: 0.4rem;
+        font-size: 1.3rem;
+        font-weight: 900;
+    }
+
+    .row dt {
+        color: var(--green);
+        text-transform: uppercase;
+    }
+
+    dd {
+        margin: 0;
+    }
+
+    .note {
+        margin: 0;
+        color: var(--muted);
+        font-style: italic;
+        font-weight: 900;
+        text-align: center;
+    }
+</style>

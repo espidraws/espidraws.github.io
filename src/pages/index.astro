@@ -1,16 +1,31 @@
 ---
+import { getEntry } from "astro:content";
+import ContactBar from "../components/ContactBar.astro";
+import Hero from "../components/Hero.astro";
+import OcDesigns from "../components/OcDesigns.astro";
+import Reviews from "../components/Reviews.astro";
+import ThumbnailTiers from "../components/ThumbnailTiers.astro";
+import Layout from "../layouts/Layout.astro";
+
+const site = (await getEntry("site", "main"))?.data.content;
+const ocDesigns = (await getEntry("ocDesigns", "main"))?.data.content;
+const tiers = (await getEntry("thumbnails", "main"))?.data.content;
+const reviews = (await getEntry("reviews", "main"))?.data.content;
+if (!site || !ocDesigns || !tiers || !reviews) {
+    throw new Error("A content file in src/content is missing");
+}
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout
+    title={`${site.name} | Thumbnail Artist`}
+    description={`${site.name}: ${site.tagline}. Thumbnail commissions, OC designs and client reviews.`}
+    image={site.avatar}
+>
+    <main>
+        <Hero site={site} />
+        <ThumbnailTiers copy={site.thumbnails} tiers={tiers} />
+        <OcDesigns designs={ocDesigns} />
+        <Reviews reviews={reviews} />
+    </main>
+    <ContactBar contactUrl={site.contactUrl} />
+</Layout>

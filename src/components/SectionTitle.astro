@@ -1,0 +1,63 @@
+---
+interface Props {
+    title: string;
+    subtitle?: string;
+}
+
+const { title, subtitle } = Astro.props;
+---
+
+<header class="section-title">
+    <svg class="chevrons" viewBox="0 0 100 50" aria-hidden="true">
+        <polygon points="0,0 22,0 47,25 22,50 0,50 25,25" />
+        <polygon points="45,0 67,0 92,25 67,50 45,50 70,25" />
+    </svg>
+    <div>
+        <h2>{title}</h2>
+        {subtitle && <p>{subtitle}</p>}
+    </div>
+    <svg class="chevrons mirrored" viewBox="0 0 100 50" aria-hidden="true">
+        <polygon points="0,0 22,0 47,25 22,50 0,50 25,25" />
+        <polygon points="45,0 67,0 92,25 67,50 45,50 70,25" />
+    </svg>
+</header>
+
+<style>
+    .section-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(0.5rem, 3vw, 2rem);
+        padding-top: 2.5rem;
+        border-top: 3px solid var(--text);
+        margin-top: 2.5rem;
+        text-align: center;
+    }
+
+    h2 {
+        margin: 0;
+        font-size: clamp(1.8rem, 5vw, 3.2rem);
+        font-weight: 900;
+        text-transform: uppercase;
+        text-decoration: underline;
+        text-underline-offset: 0.15em;
+    }
+
+    p {
+        margin: 0.2rem 0 0;
+        font-style: italic;
+        font-weight: 900;
+        text-transform: uppercase;
+        text-decoration: underline;
+    }
+
+    .chevrons {
+        width: clamp(3rem, 10vw, 7rem);
+        flex-shrink: 0;
+        fill: var(--blue);
+    }
+
+    .mirrored {
+        transform: scaleX(-1);
+    }
+</style>

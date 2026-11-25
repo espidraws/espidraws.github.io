@@ -1,0 +1,196 @@
+media:
+  input: public/uploads
+  output: /uploads
+  rename: safe
+  categories: [image]
+
+content:
+  - name: thumbnails
+    label: Thumbnail carousels
+    type: file
+    path: src/content/thumbnails.json
+    format: json
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{label} ({price})"
+    fields:
+      - name: label
+        label: Name
+        type: string
+        required: true
+      - name: badge
+        label: Badge (e.g. NEW-)
+        type: string
+      - name: price
+        label: Price
+        type: string
+        required: true
+      - name: items
+        label: Thumbnails
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{title}"
+        fields:
+          - name: title
+            label: Title
+            type: string
+            required: true
+          - name: image
+            label: Image (1280×720)
+            type: image
+            required: true
+
+  - name: reviews
+    label: Client reviews
+    type: file
+    path: src/content/reviews.json
+    format: json
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{name}"
+    fields:
+      - name: name
+        label: Client name
+        type: string
+        required: true
+      - name: subscribers
+        label: Subscribers (e.g. 10k)
+        type: string
+        required: true
+      - name: quote
+        label: Review
+        type: text
+        required: true
+      - name: avatar
+        label: Avatar (square)
+        type: image
+        required: true
+
+  - name: ocDesigns
+    label: OC designs
+    type: file
+    path: src/content/oc-designs.json
+    format: json
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: image
+        label: Showcase image
+        type: image
+        required: true
+      - name: imageAlt
+        label: Image description
+        type: string
+        required: true
+      - name: styles
+        label: Styles and prices
+        type: object
+        list:
+          collapsible:
+            summary: "{name}"
+        fields:
+          - name: name
+            label: Style
+            type: string
+            required: true
+          - name: head
+            label: Head price
+            type: string
+            required: true
+          - name: half
+            label: Half body price
+            type: string
+            required: true
+          - name: full
+            label: Full body price
+            type: string
+            required: true
+      - name: notes
+        label: Notes
+        type: string
+        list: true
+
+  - name: site
+    label: Site
+    type: file
+    path: src/content/site.json
+    format: json
+    fields:
+      - name: name
+        label: Name
+        type: string
+        required: true
+      - name: tagline
+        label: Tagline
+        type: string
+        required: true
+      - name: avatar
+        label: Profile picture
+        type: image
+        required: true
+      - name: socials
+        label: Social links
+        type: object
+        list:
+          collapsible:
+            summary: "{label}"
+        fields:
+          - name: label
+            label: Name
+            type: string
+            required: true
+          - name: url
+            label: Link
+            type: string
+            required: true
+      - name: buttons
+        label: Header buttons
+        type: object
+        list:
+          collapsible:
+            summary: "{label}"
+        fields:
+          - name: label
+            label: Text
+            type: string
+            required: true
+          - name: url
+            label: Link
+            type: string
+            required: true
+          - name: color
+            label: Color
+            type: select
+            required: true
+            options:
+              values: [blue, red, green]
+      - name: contactUrl
+        label: Contact link (bottom bar)
+        type: string
+        required: true
+      - name: thumbnails
+        label: Thumbnails section texts
+        type: object
+        fields:
+          - name: title
+            label: Title
+            type: string
+            required: true
+          - name: subtitle
+            label: Subtitle
+            type: string
+            required: true
+          - name: deal
+            label: Bundle deal
+            type: string
+            required: true
+          - name: notes
+            label: Notes
+            type: string
+            list: true

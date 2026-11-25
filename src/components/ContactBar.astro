@@ -1,0 +1,52 @@
+---
+interface Props {
+    contactUrl: string;
+}
+
+const { contactUrl } = Astro.props;
+---
+
+<footer class="contact-bar">
+    <a class="contact" href={contactUrl} target="_blank" rel="noopener">Contact me</a>
+    <a class="to-top" href="#" aria-label="Back to top">&#8963;</a>
+</footer>
+
+<style>
+    .contact-bar {
+        position: fixed;
+        inset: auto 0 0;
+        display: flex;
+        justify-content: center;
+        padding: 0.6rem;
+        background: rgb(30 30 32 / 0.9);
+        border-top: 1px solid var(--muted);
+    }
+
+    .contact {
+        padding: 0.3rem 0.8rem;
+        border-radius: 3px;
+        background: var(--text);
+        color: var(--bg);
+        font-size: 1.2rem;
+        font-weight: 900;
+        text-decoration: none;
+        text-transform: uppercase;
+    }
+
+    .to-top {
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        translate: 0 -50%;
+        display: grid;
+        place-items: center;
+        width: 2.4rem;
+        height: 2.4rem;
+        border-radius: 50%;
+        background: var(--text);
+        color: var(--bg);
+        font-size: 1.6rem;
+        font-weight: 900;
+        text-decoration: none;
+    }
+</style>

@@ -1,0 +1,14 @@
+{
+  "title": "OC Designs",
+  "image": "/uploads/site/oc-designs.webp",
+  "imageAlt": "The same original character shown as a sketch, flat colors and fully rendered",
+  "styles": [
+    { "name": "Sketch", "head": "$5+", "half": "$10+", "full": "$15+" },
+    { "name": "Flat", "head": "$10+", "half": "$20+", "full": "$35+" },
+    { "name": "Rendered", "head": "$15+", "half": "$30+", "full": "$45+" }
+  ],
+  "notes": [
+    "I Can Also Do Different Styles As Well (WORKS BEST WITH REFERENCES)",
+    "Extra Characters are half of what you're asking for. EXAMPLE: FULL RENDER $45+ -> $23+"
+  ]
+}
