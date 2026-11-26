@@ -21,3 +21,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# YouTube stats cache, restored by the deploy workflow
+.cache/

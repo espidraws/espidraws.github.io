@@ -5,7 +5,9 @@ import Hero from "../components/Hero.astro";
 import OcDesigns from "../components/OcDesigns.astro";
 import Reviews from "../components/Reviews.astro";
 import ThumbnailTiers from "../components/ThumbnailTiers.astro";
+import TotalViews from "../components/TotalViews.astro";
 import Layout from "../layouts/Layout.astro";
+import { formatCount, loadYouTubeStats } from "../lib/youtube";
 
 const site = (await getEntry("site", "main"))?.data.content;
 const ocDesigns = (await getEntry("ocDesigns", "main"))?.data.content;
@@ -14,6 +16,25 @@ const reviews = (await getEntry("reviews", "main"))?.data.content.reviews;
 if (!site || !ocDesigns || !tiers || !reviews) {
     throw new Error("A content file in src/content is missing");
 }
+
+const thumbnails = tiers.flatMap((tier) => tier.items);
+const stats = await loadYouTubeStats(
+    reviews.map((review) => review.channel),
+    thumbnails.map((thumbnail) => thumbnail.video),
+);
+
+const tiersWithViews = tiers.map((tier) => ({
+    ...tier,
+    items: tier.items.map((thumbnail) => {
+        const views = stats.getViews(thumbnail.video);
+        return { ...thumbnail, views: views === undefined ? undefined : formatCount(views) };
+    }),
+}));
+
+const reviewsWithLiveSubscribers = reviews.map((review) => {
+    const subscribers = stats.getSubscribers(review.channel);
+    return { ...review, subscribers: subscribers === undefined ? review.subscribers : formatCount(subscribers) };
+});
 ---
 
 <Layout
@@ -23,9 +44,10 @@ if (!site || !ocDesigns || !tiers || !reviews) {
 >
     <main>
         <Hero site={site} />
-        <ThumbnailTiers copy={site.thumbnails} tiers={tiers} />
+        <ThumbnailTiers copy={site.thumbnails} tiers={tiersWithViews} />
+        {stats.totalViews > 0 && <TotalViews copy={site.totalViews} total={formatCount(stats.totalViews)} />}
         <OcDesigns designs={ocDesigns} />
-        <Reviews reviews={reviews} />
+        <Reviews reviews={reviewsWithLiveSubscribers} />
     </main>
     <ContactBar contactUrl={site.contactUrl} />
 </Layout>

@@ -1,0 +1,38 @@
+---
+import type { CollectionEntry } from "astro:content";
+import SectionTitle from "./SectionTitle.astro";
+
+interface Props {
+    copy: CollectionEntry<"site">["data"]["content"]["totalViews"];
+    total: string;
+}
+
+const { copy, total } = Astro.props;
+---
+
+<section id="total-views">
+    <SectionTitle title={copy.title} />
+    <p class="total">{total}+</p>
+    <p class="label">{copy.label}</p>
+</section>
+
+<style>
+    section {
+        text-align: center;
+    }
+
+    .total {
+        margin: 1.5rem 0 0;
+        color: var(--green);
+        font-size: clamp(3.5rem, 12vw, 7rem);
+        font-weight: 900;
+        line-height: 1;
+    }
+
+    .label {
+        margin: 0.5rem 0 0;
+        font-style: italic;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+</style>

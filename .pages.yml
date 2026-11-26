@@ -46,6 +46,10 @@ content:
                 label: Image (1280×720)
                 type: image
                 required: true
+              - name: video
+                label: YouTube video link
+                description: Optional. Its views show on the thumbnail and add to the total, updated weekly.
+                type: string
 
   - name: reviews
     label: Client reviews
@@ -65,8 +69,13 @@ content:
             label: Client name
             type: string
             required: true
+          - name: channel
+            label: YouTube channel
+            description: Optional. @handle or channel link; its subscriber count is updated weekly.
+            type: string
           - name: subscribers
             label: Subscribers (e.g. 10k)
+            description: Shown when no channel is set or YouTube can't be reached.
             type: string
             required: true
           - name: quote
@@ -202,3 +211,16 @@ content:
             label: Notes
             type: string
             list: true
+      - name: totalViews
+        label: Total views section texts
+        description: The section appears once at least one thumbnail has a YouTube video link.
+        type: object
+        fields:
+          - name: title
+            label: Title
+            type: string
+            required: true
+          - name: label
+            label: Text under the number
+            type: string
+            required: true

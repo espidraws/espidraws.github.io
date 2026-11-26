@@ -4,9 +4,10 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { withBase } from "../lib/url";
 
-interface Slide {
+export interface Slide {
     title: string;
     image: string;
+    views?: string;
 }
 
 interface Props {
@@ -21,7 +22,12 @@ const { galleryId, label, slides } = Astro.props;
 <div class="swiper carousel" aria-label={label}>
     <div class="swiper-wrapper">
         {slides.map((slide, index) => (
-            <a class="swiper-slide glightbox" href={withBase(slide.image)} data-gallery={galleryId} data-title={slide.title}>
+            <a
+                class="swiper-slide glightbox"
+                href={withBase(slide.image)}
+                data-gallery={galleryId}
+                data-title={slide.views ? `${slide.title} · ${slide.views} views` : slide.title}
+            >
                 <img
                     src={withBase(slide.image)}
                     alt={slide.title}
@@ -30,6 +36,7 @@ const { galleryId, label, slides } = Astro.props;
                     loading={index === 0 ? "eager" : "lazy"}
                     decoding="async"
                 />
+                {slide.views && <span class="views">{slide.views} views</span>}
             </a>
         ))}
     </div>
@@ -84,5 +91,16 @@ const { galleryId, label, slides } = Astro.props;
         width: 100%;
         aspect-ratio: 16 / 9;
         object-fit: cover;
+    }
+
+    .views {
+        position: absolute;
+        right: 0.4rem;
+        bottom: 0.4rem;
+        padding: 0.15rem 0.5rem;
+        border-radius: 999px;
+        background: rgb(0 0 0 / 0.75);
+        color: var(--text);
+        font-size: 0.8rem;
     }
 </style>

@@ -27,6 +27,10 @@ const site = defineCollection({
                 deal: z.string(),
                 notes: z.array(z.string()),
             }),
+            totalViews: z.object({
+                title: z.string(),
+                label: z.string(),
+            }),
         }),
     }),
 });
@@ -60,7 +64,13 @@ const thumbnails = defineCollection({
                     label: z.string(),
                     badge: z.string().optional(),
                     price: z.string(),
-                    items: z.array(z.object({ title: z.string(), image: z.string() })),
+                    items: z.array(
+                        z.object({
+                            title: z.string(),
+                            image: z.string(),
+                            video: z.string().optional(),
+                        }),
+                    ),
                 }),
             ),
         }),
@@ -74,6 +84,7 @@ const reviews = defineCollection({
             reviews: z.array(
                 z.object({
                     name: z.string(),
+                    channel: z.string().optional(),
                     subscribers: z.string(),
                     quote: z.string(),
                     avatar: z.string(),

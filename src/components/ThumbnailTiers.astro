@@ -1,11 +1,13 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import Carousel from "./Carousel.astro";
+import Carousel, { type Slide } from "./Carousel.astro";
 import SectionTitle from "./SectionTitle.astro";
+
+type Tier = CollectionEntry<"thumbnails">["data"]["content"]["tiers"][number];
 
 interface Props {
     copy: CollectionEntry<"site">["data"]["content"]["thumbnails"];
-    tiers: CollectionEntry<"thumbnails">["data"]["content"]["tiers"];
+    tiers: (Omit<Tier, "items"> & { items: Slide[] })[];
 }
 
 const { copy, tiers } = Astro.props;
@@ -19,7 +21,7 @@ const { copy, tiers } = Astro.props;
                 <h3 class="price">
                     {tier.badge && <span class="badge">{tier.badge}</span>} {tier.price}
                 </h3>
-                <Carousel galleryId={`tier-${index}`}label={`${tier.label} thumbnails`} slides={tier.items} />
+                <Carousel galleryId={`tier-${index}`} label={`${tier.label} thumbnails`} slides={tier.items} />
                 <p class="label">{tier.label}</p>
             </article>
         ))}
