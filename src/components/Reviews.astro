@@ -12,9 +12,9 @@ const { reviews } = Astro.props;
 
 <section id="reviews">
     <SectionTitle title="Client Reviews" />
-    <ul>
+    <ul data-glow-grid="reviews">
         {reviews.map((review) => (
-            <li>
+            <li class="card glow-card">
                 <figure>
                     <img src={withBase(review.avatar)} alt="" width="256" height="256" loading="lazy" decoding="async" />
                     <figcaption>
@@ -28,14 +28,28 @@ const { reviews } = Astro.props;
     </ul>
 </section>
 
+<script>
+    import { trackGlowGrid } from "../lib/glow-grid";
+
+    document.querySelectorAll<HTMLElement>('[data-glow-grid="reviews"]').forEach(trackGlowGrid);
+</script>
+
 <style>
     ul {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
-        gap: 2rem;
+        gap: 1.25rem;
         margin: 2rem 0 0;
         padding: 0;
         list-style: none;
+    }
+
+    .card {
+        padding: 1.1rem;
+        border-radius: 14px;
+        background:
+            radial-gradient(420px circle at var(--glow-x, -500px) var(--glow-y, -500px), rgb(94 146 255 / 0.1), transparent 45%),
+            rgb(255 255 255 / 0.03);
     }
 
     figure {

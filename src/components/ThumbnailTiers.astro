@@ -1,13 +1,15 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import Carousel, { type Slide } from "./Carousel.astro";
+import type { ThumbnailCard } from "../lib/thumbnail-card";
+import Carousel from "./Carousel.astro";
 import SectionTitle from "./SectionTitle.astro";
+import ThumbnailDialog from "./ThumbnailDialog.astro";
 
 type Tier = CollectionEntry<"thumbnails">["data"]["content"]["tiers"][number];
 
 interface Props {
     copy: CollectionEntry<"site">["data"]["content"]["thumbnails"];
-    tiers: (Omit<Tier, "items"> & { items: Slide[] })[];
+    tiers: (Omit<Tier, "items"> & { items: ThumbnailCard[] })[];
 }
 
 const { copy, tiers } = Astro.props;
@@ -15,20 +17,27 @@ const { copy, tiers } = Astro.props;
 
 <section id="thumbnails">
     <SectionTitle title={copy.title} subtitle={copy.subtitle} />
-    <div class="tiers">
+    <div class="tiers" data-glow-grid="thumbnails">
         {tiers.map((tier, index) => (
             <article>
                 <h3 class="price">
                     {tier.badge && <span class="badge">{tier.badge}</span>} {tier.price}
                 </h3>
-                <Carousel galleryId={`tier-${index}`} label={`${tier.label} thumbnails`} slides={tier.items} />
+                <Carousel tierIndex={index} label={`${tier.label} thumbnails`} slides={tier.items} />
                 <p class="label">{tier.label}</p>
             </article>
         ))}
     </div>
     <p class="deal">{copy.deal}</p>
     {copy.notes.map((note) => <p class="note">{note}</p>)}
+    <ThumbnailDialog tiers={tiers.map(({ label, items }) => ({ label, items }))} />
 </section>
+
+<script>
+    import { trackGlowGrid } from "../lib/glow-grid";
+
+    document.querySelectorAll<HTMLElement>('[data-glow-grid="thumbnails"]').forEach(trackGlowGrid);
+</script>
 
 <style>
     .tiers {

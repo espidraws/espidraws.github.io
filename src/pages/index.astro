@@ -7,6 +7,7 @@ import Reviews from "../components/Reviews.astro";
 import ThumbnailTiers from "../components/ThumbnailTiers.astro";
 import TotalViews from "../components/TotalViews.astro";
 import Layout from "../layouts/Layout.astro";
+import { withBase } from "../lib/url";
 import { formatCount, loadYouTubeStats } from "../lib/youtube";
 
 const site = (await getEntry("site", "main"))?.data.content;
@@ -23,16 +24,34 @@ const stats = await loadYouTubeStats(
     thumbnails.map((thumbnail) => thumbnail.video),
 );
 
-const tiersWithViews = tiers.map((tier) => ({
+const reviewsByChannelId = new Map(
+    reviews.flatMap((review) => {
+        const channelId = stats.getChannel(review.channel)?.id;
+        return channelId ? [[channelId, review] as const] : [];
+    }),
+);
+
+const tiersWithVideoInfo = tiers.map((tier) => ({
     ...tier,
     items: tier.items.map((thumbnail) => {
-        const views = stats.getViews(thumbnail.video);
-        return { ...thumbnail, views: views === undefined ? undefined : formatCount(views) };
+        const video = stats.getVideo(thumbnail.video);
+        const channel = video ? stats.getChannel(video.channelId) : undefined;
+        const review = video ? reviewsByChannelId.get(video.channelId) : undefined;
+        return {
+            title: video?.title ?? thumbnail.title,
+            image: withBase(thumbnail.image),
+            videoUrl: thumbnail.video || undefined,
+            views: video ? formatCount(video.views) : undefined,
+            likes: video?.likes === undefined ? undefined : formatCount(video.likes),
+            channelName: channel?.title,
+            channelAvatar: channel?.avatar,
+            review: review ? { name: review.name, quote: review.quote } : undefined,
+        };
     }),
 }));
 
 const reviewsWithLiveSubscribers = reviews.map((review) => {
-    const subscribers = stats.getSubscribers(review.channel);
+    const subscribers = stats.getChannel(review.channel)?.subscribers;
     return { ...review, subscribers: subscribers === undefined ? review.subscribers : formatCount(subscribers) };
 });
 ---
@@ -44,7 +63,7 @@ const reviewsWithLiveSubscribers = reviews.map((review) => {
 >
     <main>
         <Hero site={site} />
-        <ThumbnailTiers copy={site.thumbnails} tiers={tiersWithViews} />
+        <ThumbnailTiers copy={site.thumbnails} tiers={tiersWithVideoInfo} />
         {stats.totalViews > 0 && <TotalViews copy={site.totalViews} total={formatCount(stats.totalViews)} />}
         <OcDesigns designs={ocDesigns} />
         <Reviews reviews={reviewsWithLiveSubscribers} />

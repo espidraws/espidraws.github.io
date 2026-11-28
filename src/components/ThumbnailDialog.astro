@@ -1,0 +1,421 @@
+---
+import type { ThumbnailTier } from "../lib/thumbnail-card";
+
+interface Props {
+    tiers: ThumbnailTier[];
+}
+
+const { tiers } = Astro.props;
+const tiersJson = JSON.stringify(tiers).replaceAll("<", "\\u003c");
+---
+
+<script type="application/json" id="thumbnail-data" set:html={tiersJson} />
+
+<dialog class="thumbnail-dialog" data-thumbnail-dialog aria-labelledby="thumbnail-dialog-title">
+    <button class="close" type="button" data-close aria-label="Close">&times;</button>
+    <div class="layout">
+        <div class="video">
+            <div class="shot">
+                <img class="glow" data-field="glow" src="" alt="" aria-hidden="true" />
+                <img class="image" data-field="image" src="" alt="" width="1280" height="720" />
+            </div>
+            <p class="stats" data-field="stats"></p>
+            <div class="meta">
+                <img class="avatar" data-field="avatar" src="" alt="" width="88" height="88" />
+                <div>
+                    <a id="thumbnail-dialog-title" class="title" data-field="title" target="_blank" rel="noopener"></a>
+                    <p class="channel" data-field="channel"></p>
+                </div>
+            </div>
+        </div>
+        <aside>
+            <section class="review" data-field="review">
+                <h2>Review</h2>
+                <blockquote data-field="quote"></blockquote>
+                <p class="reviewer" data-field="reviewer"></p>
+            </section>
+            <h2 data-field="tier"></h2>
+            <div class="similar" data-field="similar"></div>
+        </aside>
+    </div>
+</dialog>
+
+<script>
+    import type { ThumbnailCard, ThumbnailTier } from "../lib/thumbnail-card";
+
+    const SIMILAR_COUNT = 4;
+    const MOTION_EASING = "cubic-bezier(0.2, 0.8, 0.2, 1)";
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const dialog = document.querySelector<HTMLDialogElement>("[data-thumbnail-dialog]");
+    const tiers = JSON.parse(document.getElementById("thumbnail-data")?.textContent ?? "[]") as ThumbnailTier[];
+
+    function getField<T extends HTMLElement>(name: string): T {
+        const element = dialog?.querySelector<T>(`[data-field="${name}"]`);
+        if (!element) {
+            throw new Error(`Thumbnail dialog is missing [data-field="${name}"]`);
+        }
+        return element;
+    }
+
+    function getFollowingCards(tier: ThumbnailTier, index: number): { card: ThumbnailCard; index: number }[] {
+        const count = Math.min(SIMILAR_COUNT, tier.items.length - 1);
+        return Array.from({ length: count }, (_, offset) => {
+            const followingIndex = (index + offset + 1) % tier.items.length;
+            return { card: tier.items[followingIndex], index: followingIndex };
+        });
+    }
+
+    function renderSimilarButton(tierIndex: number, card: ThumbnailCard, index: number): HTMLButtonElement {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "similar-card";
+        button.dataset.thumbnailTier = String(tierIndex);
+        button.dataset.thumbnailIndex = String(index);
+        button.setAttribute("aria-label", `Show ${card.title}`);
+        const image = document.createElement("img");
+        image.src = card.image;
+        image.alt = "";
+        image.loading = "lazy";
+        button.append(image);
+        return button;
+    }
+
+    function showThumbnail(tierIndex: number, index: number) {
+        const tier = tiers[tierIndex];
+        const card = tier?.items[index];
+        if (!card) {
+            return;
+        }
+        getField<HTMLImageElement>("image").src = card.image;
+        getField<HTMLImageElement>("image").alt = card.title;
+        getField<HTMLImageElement>("glow").src = card.image;
+
+        const stats = [card.views && `${card.views} views`, card.likes && `${card.likes} likes`].filter(Boolean);
+        getField("stats").textContent = stats.join(" · ");
+
+        const title = getField<HTMLAnchorElement>("title");
+        title.textContent = card.title;
+        if (card.videoUrl) {
+            title.href = card.videoUrl;
+        } else {
+            title.removeAttribute("href");
+        }
+
+        const avatar = getField<HTMLImageElement>("avatar");
+        avatar.hidden = !card.channelAvatar;
+        avatar.src = card.channelAvatar ?? "";
+        getField("channel").textContent = card.channelName ?? "";
+
+        getField("review").hidden = !card.review;
+        getField("quote").textContent = card.review ? `“${card.review.quote}”` : "";
+        getField("reviewer").textContent = card.review ? `— ${card.review.name}` : "";
+
+        getField("tier").textContent = tier.label;
+        getField("similar").replaceChildren(
+            ...getFollowingCards(tier, index).map((following) => renderSimilarButton(tierIndex, following.card, following.index)),
+        );
+    }
+
+    function flyFrom(source: DOMRect, target: HTMLElement, duration: number): Animation {
+        const bounds = target.getBoundingClientRect();
+        const offset = `translate(${source.left - bounds.left}px, ${source.top - bounds.top}px)`;
+        const scale = `scale(${source.width / bounds.width}, ${source.height / bounds.height})`;
+        return target.animate(
+            [
+                { transformOrigin: "0 0", transform: `${offset} ${scale}` },
+                { transformOrigin: "0 0", transform: "none" },
+            ],
+            { duration, easing: MOTION_EASING },
+        );
+    }
+
+    // The ghost is fixed-positioned, so it must be created while the dialog has no transform.
+    function sendAway(image: HTMLImageElement) {
+        const bounds = image.getBoundingClientRect();
+        const ghost = image.cloneNode() as HTMLImageElement;
+        Object.assign(ghost.style, {
+            position: "fixed",
+            left: `${bounds.left}px`,
+            top: `${bounds.top}px`,
+            width: `${bounds.width}px`,
+            height: `${bounds.height}px`,
+            margin: "0",
+            borderRadius: "12px",
+            pointerEvents: "none",
+        });
+        dialog?.append(ghost);
+        ghost
+            .animate(
+                [
+                    { opacity: 1, transform: "none" },
+                    { opacity: 0, transform: "translateX(-14%) scale(0.8) rotate(-5deg)" },
+                ],
+                { duration: 450, easing: MOTION_EASING },
+            )
+            .finished.then(() => ghost.remove());
+    }
+
+    function revealInSequence(elements: Element[], firstDelay: number) {
+        elements.forEach((element, position) =>
+            element.animate(
+                [
+                    { opacity: 0, transform: "translateY(14px)" },
+                    { opacity: 1, transform: "none" },
+                ],
+                { duration: 380, delay: firstDelay + position * 60, easing: MOTION_EASING, fill: "backwards" },
+            ),
+        );
+    }
+
+    function getRevealTargets(): Element[] {
+        return [getField("stats"), getField("review"), getField("tier"), ...getField("similar").children].filter(
+            (element) => !(element as HTMLElement).hidden,
+        );
+    }
+
+    function openFrom(trigger: HTMLElement) {
+        if (!dialog) {
+            return;
+        }
+        const source = (trigger.querySelector("img") ?? trigger).getBoundingClientRect();
+        const image = getField<HTMLImageElement>("image");
+        const isSwap = dialog.open;
+        if (isSwap && !prefersReducedMotion) {
+            sendAway(image);
+        }
+        showThumbnail(Number(trigger.dataset.thumbnailTier), Number(trigger.dataset.thumbnailIndex));
+        if (!isSwap) {
+            dialog.showModal();
+        }
+        if (prefersReducedMotion) {
+            return;
+        }
+        if (!isSwap) {
+            dialog.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: "ease-out" });
+        }
+        // The dialog scrolls on small screens; unclip it so the image can fly in from outside.
+        dialog.style.overflow = "visible";
+        flyFrom(source, image, isSwap ? 480 : 560).finished.then(() => dialog.style.removeProperty("overflow"));
+        getField("glow").animate([{ opacity: 0 }, { opacity: 0.75 }], { duration: 700, delay: 200, fill: "backwards" });
+        revealInSequence(getRevealTargets(), isSwap ? 80 : 180);
+    }
+
+    function closeDialog() {
+        if (!dialog?.open) {
+            return;
+        }
+        if (prefersReducedMotion) {
+            dialog.close();
+            return;
+        }
+        dialog
+            .animate(
+                [
+                    { opacity: 1, transform: "none" },
+                    { opacity: 0, transform: "scale(0.94)" },
+                ],
+                { duration: 200, easing: "ease-in" },
+            )
+            .finished.then(() => dialog.close());
+    }
+
+    document.addEventListener("click", (event) => {
+        const trigger = (event.target as Element).closest<HTMLElement>("[data-thumbnail-tier]");
+        if (trigger) {
+            openFrom(trigger);
+        }
+    });
+
+    dialog?.querySelector("[data-close]")?.addEventListener("click", closeDialog);
+    dialog?.addEventListener("click", (event) => {
+        if (event.target === dialog) {
+            closeDialog();
+        }
+    });
+    dialog?.addEventListener("cancel", (event) => {
+        event.preventDefault();
+        closeDialog();
+    });
+
+    dialog?.addEventListener("pointermove", (event) => {
+        const card = (event.target as Element).closest<HTMLElement>(".similar-card");
+        if (!card) {
+            return;
+        }
+        const bounds = card.getBoundingClientRect();
+        card.style.setProperty("--tilt-x", `${((event.clientY - bounds.top) / bounds.height - 0.5) * -14}deg`);
+        card.style.setProperty("--tilt-y", `${((event.clientX - bounds.left) / bounds.width - 0.5) * 14}deg`);
+    });
+    dialog?.addEventListener("pointerout", (event) => {
+        const card = (event.target as Element).closest<HTMLElement>(".similar-card");
+        card?.style.removeProperty("--tilt-x");
+        card?.style.removeProperty("--tilt-y");
+    });
+</script>
+
+<style>
+    .thumbnail-dialog {
+        width: min(96vw, 1200px);
+        max-height: 92vh;
+        padding: clamp(1rem, 3vw, 2rem);
+        border: 1px solid rgb(255 255 255 / 0.12);
+        border-radius: 16px;
+        background: var(--bg);
+        color: var(--text);
+        overflow: auto;
+    }
+
+    .thumbnail-dialog::backdrop {
+        background: rgb(0 0 0 / 0.8);
+        backdrop-filter: blur(4px);
+    }
+
+    .close {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.75rem;
+        border: 0;
+        background: none;
+        color: var(--text);
+        font-size: 2rem;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+        gap: clamp(1rem, 3vw, 2.5rem);
+    }
+
+    .shot {
+        position: relative;
+        isolation: isolate;
+    }
+
+    .image {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+        border-radius: 12px;
+    }
+
+    .glow {
+        position: absolute;
+        top: 8%;
+        left: 4%;
+        z-index: -1;
+        width: 92%;
+        height: 100%;
+        object-fit: cover;
+        filter: blur(28px) saturate(1.6);
+        opacity: 0.75;
+    }
+
+    .stats {
+        margin: 0.6rem 0 0;
+        color: var(--muted);
+        font-family: var(--font-body);
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 0.75rem;
+    }
+
+    .avatar {
+        width: 72px;
+        height: 72px;
+        flex-shrink: 0;
+        border-radius: 50%;
+    }
+
+    .title {
+        font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+        font-weight: 900;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 0.2em;
+    }
+
+    .title[href]:hover,
+    .title[href]:focus-visible {
+        color: var(--blue);
+    }
+
+    .channel {
+        margin: 0.2rem 0 0;
+        color: var(--muted);
+        font-family: var(--font-body);
+        font-weight: 600;
+    }
+
+    aside h2 {
+        margin: 0 0 0.6rem;
+        font-size: clamp(1.6rem, 3vw, 2.4rem);
+        font-weight: 900;
+        text-align: center;
+    }
+
+    .review {
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    blockquote {
+        margin: 0;
+        font-family: var(--font-body);
+        font-weight: 600;
+    }
+
+    .reviewer {
+        margin: 0.5rem 0 0;
+        color: var(--green);
+        font-weight: 900;
+    }
+
+    .similar {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        perspective: 600px;
+    }
+
+    .similar :global(.similar-card) {
+        padding: 0;
+        border: 0;
+        border-radius: 8px;
+        background: none;
+        cursor: pointer;
+        transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+        transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+    }
+
+    .similar :global(.similar-card:hover),
+    .similar :global(.similar-card:focus-visible) {
+        box-shadow: 0 10px 24px rgb(0 0 0 / 0.6);
+    }
+
+    .similar :global(.similar-card img) {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    @media (width < 800px) {
+        .layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .similar :global(.similar-card) {
+            transform: none;
+        }
+    }
+</style>
